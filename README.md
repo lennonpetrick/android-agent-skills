@@ -1,5 +1,10 @@
-# android-agent-skills
+# android-engineering-skills
 A collection of modern Android architecture, implementation patterns, and testing conventions designed for AI coding agents and teams.
+
+> **Works alongside Google's official [Android skills](https://github.com/android/skills).**
+> Google's skills handle specific tasks, like migrating XML to Compose or upgrading AGP.
+> This repo covers how an Android project is structured, written and tested.
+> Use both together.
 
 This repository provides opinionated guidelines for building maintainable, scalable, and production-ready Android applications using Kotlin and Jetpack Compose.
 
@@ -107,9 +112,9 @@ These documents are useful for:
 ```
 AGENTS.md
 skills/
-    android-architecture.md
-    android-patterns.md
-    android-testing.md
+    android-architecture-skill.md
+    android-patterns-skill.md
+    android-testing-skill.md
 ```
 
 ## Philosophy

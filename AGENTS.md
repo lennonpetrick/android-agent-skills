@@ -2,9 +2,9 @@
 
 Before implementing or modifying any code, consult:
 
-- skills/android-architecture.md
-- skills/android-patterns.md
-- skills/android-testing.md
+- skills/android-architecture-skill.md
+- skills/android-patterns-skill.md
+- skills/android-testing-skill.md
 
 Follow:
 
