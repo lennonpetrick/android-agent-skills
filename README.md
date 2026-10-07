@@ -1,103 +1,66 @@
 # android-engineering-skills
-A collection of modern Android architecture, implementation patterns, and testing conventions designed for AI coding agents and teams.
+
+Skills that teach AI coding agents how to structure, write and test Android apps with Kotlin and Jetpack Compose.
 
 > **Works alongside Google's official [Android skills](https://github.com/android/skills).**
 > Google's skills handle specific tasks, like migrating XML to Compose or upgrading AGP.
-> This repo covers how an Android project is structured, written and tested.
+> These skills cover how an Android project is structured, written and tested.
 > Use both together.
 
-This repository provides opinionated guidelines for building maintainable, scalable, and production-ready Android applications using Kotlin and Jetpack Compose.
-
-The goal is to optimize for readability, explicit state, separation of concerns, and long-term maintainability.
-
-## Principles
-
-* Correctness over cleverness
-* Explicit state over implicit behavior
-* Testability first
-* Reactive architecture
-* Separation of concerns
-* Maintainable solutions
-* Code that new engineers can understand quickly
-
-## Technology Stack
-
-* Kotlin
-* Jetpack Compose
-* Coroutines
-* Flow / StateFlow
-* Hilt
-* Retrofit
-* Kotlin Serialization
-* JUnit 5
-* Turbine
-* Mockito or MockK
+**Code is read more often than it is written.** These skills optimize for the next engineer reading the code, not the current engineer writing it.
 
 ## Skills
 
-### Android Architecture
+| Skill | What it covers | When the agent uses it |
+| --- | --- | --- |
+| [`android-architecture`](android-architecture/SKILL.md) | Feature-first package layout, layer boundaries, naming, visibility and Hilt setup | Creating a project or feature, adding DI bindings, naming classes, deciding where code belongs |
+| [`android-patterns`](android-patterns/SKILL.md) | Unidirectional data flow, ViewModels, state and actions, Flow composition, error handling, repositories, use cases and Compose UI | Writing ViewModels, state models, repositories, use cases or Compose screens |
+| [`android-testing`](android-testing/SKILL.md) | JUnit 5, Turbine, MockK or Mockito-Kotlin, test naming and structure, parameterized tests | Writing or reviewing unit tests for ViewModels, use cases, mappers and repositories |
 
-Defines:
+Agents load a skill only when a task matches it, so the skills don't add to every prompt.
 
-* Project structure
-* Layer boundaries
-* Naming conventions
-* Package organization
-* Dependency injection setup
+## What the skills enforce
 
-Use when:
+These are opinionated. Check that they match how your team works before adopting them.
 
-* Creating a new project
-* Adding a feature
-* Refactoring existing code
-* Designing modules
+**Architecture**
 
-### Android Patterns
+- Layers are `ui → presentation → domain ← data`, and dependencies always point inward.
+- `domain` has no Android, Compose, Retrofit, database or DI dependencies.
+- Code is organized by feature. No `utils` or `helpers` dumping grounds.
 
-Defines:
+**Patterns**
 
-* Unidirectional Data Flow
-* ViewModel design
-* State management
-* Flow composition
-* Repository patterns
-* UseCases
-* Compose patterns
-* Error handling
+- State flows down from the ViewModel, and actions flow up from the UI through callbacks.
+- Screens expose a single UI state through `StateFlow`. One-shot events go through `SharedFlow`.
+- Operations that can fail return `Result`, with errors mapped to explicit types.
 
-Use when:
+**Testing**
 
-* Implementing features
-* Creating ViewModels
-* Designing state models
-* Building Compose screens
+- Test names use backticks and read like a sentence: `` `When amount is valid then it returns parsed value` ``.
+- The class under test is always named `sut`.
+- Each test follows the same order: create objects and mocks, stub, act, assert.
+- Flows are tested with Turbine inside `runTest`.
 
-### Android Testing
+## Assumed stack
 
-Defines:
+Kotlin, Jetpack Compose, Coroutines and Flow, Hilt, Retrofit, JUnit 5, Turbine, and MockK or Mockito-Kotlin.
 
-* JUnit 5 conventions
-* Test naming patterns
-* Arrange / Stub / Act / Assert structure
-* Turbine usage
-* Mockito or MockK usage
-* Parameterized tests
-* Dynamic tests
-
-Use when:
-
-* Writing unit tests
-* Testing Flows
-* Creating test suites
-* Reviewing test quality
+If your project uses something else, like Koin or XML views, the skills still apply in principle. You can also fork them and adjust them (see [Customize the skills](#customize-the-skills)).
 
 ## How to Set Up
 
-Each coding agent looks for skills in its own folder. Copy the three skill folders into the folder your agent reads, and it picks them up automatically when a task matches the skill's description.
+Each coding agent reads skills from its own folder:
+
+| Agent | Project folder | User folder (all projects) |
+| --- | --- | --- |
+| Gemini in Android Studio | `.agents/skills/` | `~/.agents/skills/` |
+| Codex | `.agents/skills/` | `~/.agents/skills/` |
+| Claude Code | `.claude/skills/` | `~/.claude/skills/` |
 
 ### 1. Clone this repo
 
-Clone it somewhere outside your project:
+Clone it somewhere outside your project.
 
 macOS / Linux:
 
@@ -113,11 +76,11 @@ git clone --depth 1 https://github.com/lennonpetrick/android-engineering-skills.
 
 ### 2. Copy the skills into your project
 
-Run the commands for your agent from your project's root folder.
+Run the commands for your agent from your project's root folder. They never overwrite anything: if you already have a skill with the same name, yours is kept.
 
-The commands never overwrite anything. If you already have a skill with the same name, yours is kept.
+#### Gemini in Android Studio and Codex
 
-#### Gemini in Android Studio
+Both read `.agents/skills/`, so one copy works for both.
 
 macOS / Linux:
 
@@ -135,28 +98,6 @@ Get-ChildItem "$env:TEMP\android-engineering-skills\android-*" -Directory | Wher
 
 Android Studio also reads `.android-studio/skills/`. Versions before Android Studio Quail read `.skills/` instead.
 
-Invoke a skill manually by typing `@` in the Gemini chat.
-
-#### Codex
-
-macOS / Linux:
-
-```bash
-mkdir -p .agents/skills
-cp -Rn /tmp/android-engineering-skills/android-* .agents/skills/
-```
-
-Windows (PowerShell):
-
-```powershell
-New-Item -ItemType Directory -Force .agents\skills | Out-Null
-Get-ChildItem "$env:TEMP\android-engineering-skills\android-*" -Directory | Where-Object { -not (Test-Path ".agents\skills\$($_.Name)") } | Copy-Item -Destination .agents\skills -Recurse
-```
-
-Codex and Gemini in Android Studio share `.agents/skills/`, so one copy works for both.
-
-Invoke a skill manually with `$android-architecture`, `$android-patterns` or `$android-testing`.
-
 #### Claude Code
 
 macOS / Linux:
@@ -173,17 +114,13 @@ New-Item -ItemType Directory -Force .claude\skills | Out-Null
 Get-ChildItem "$env:TEMP\android-engineering-skills\android-*" -Directory | Where-Object { -not (Test-Path ".claude\skills\$($_.Name)") } | Copy-Item -Destination .claude\skills -Recurse
 ```
 
-Invoke a skill manually with `/android-architecture`, `/android-patterns` or `/android-testing`.
-
 #### Other agents
 
 Any agent that supports the Agent Skills format works the same way. Copy the three folders into the skills folder it reads.
 
 ### Use the skills in all your projects
 
-To install the skills for your user instead of one project, use your home folder as the destination: `~/.agents/skills` or `~/.claude/skills` on macOS and Linux, `$HOME\.agents\skills` or `$HOME\.claude\skills` on Windows.
-
-For example, for Claude Code:
+Use the user folder from the table as the destination instead. For example, for Claude Code:
 
 macOS / Linux:
 
@@ -199,9 +136,25 @@ New-Item -ItemType Directory -Force $HOME\.claude\skills | Out-Null
 Get-ChildItem "$env:TEMP\android-engineering-skills\android-*" -Directory | Where-Object { -not (Test-Path "$HOME\.claude\skills\$($_.Name)") } | Copy-Item -Destination $HOME\.claude\skills -Recurse
 ```
 
-### Update the skills
+## Try It
 
-Pull the latest version, then copy again with overwriting allowed. This example updates `.agents/skills`; change the folder to match where you installed them:
+Agents pick up the skills on their own when a request matches. Some prompts to try:
+
+- "Add a transactions screen that loads a list from the API and supports pull to refresh."
+- "Write unit tests for `TransactionsViewModel`."
+- "Review this feature for layer boundary violations."
+
+You can also call a skill directly:
+
+| Agent | How to call a skill |
+| --- | --- |
+| Gemini in Android Studio | Type `@` in the chat and pick the skill |
+| Codex | `$android-patterns` |
+| Claude Code | `/android-patterns` |
+
+## Update the Skills
+
+Pull the latest version, then copy again with overwriting allowed. Change `.agents/skills` to the folder where you installed them.
 
 macOS / Linux:
 
@@ -217,45 +170,30 @@ git -C "$env:TEMP\android-engineering-skills" pull
 Get-ChildItem "$env:TEMP\android-engineering-skills\android-*" -Directory | Copy-Item -Destination .agents\skills -Recurse -Force
 ```
 
-If you customized a skill, rename its folder first so the update doesn't overwrite your changes.
+## Customize the Skills
 
-## Intended Audience
+The skills are plain Markdown, so you can edit them to match your team's conventions. For example, you can switch the mocking library, change the package layout or add your own review checklist items.
 
-These documents are useful for:
+If you customize a skill, rename its folder and the `name` in its frontmatter. That way an update won't overwrite your changes.
 
-* Android engineers
-* Tech leads
-* Staff engineers
-* Teams defining coding standards
-* AI coding assistants
-* Cursor
-* Claude Code
-* Gemini
-* GitHub Copilot
-* ChatGPT
-* Codex
+## Contributing
 
-## Repository Structure
+Issues and pull requests are welcome, especially:
 
-Each skill is a folder with a `SKILL.md` file, following the Agent Skills format.
+- corrections where a rule is wrong, unclear or outdated
+- examples that make a rule easier for an agent to follow
+- new skills for topics not covered yet, such as navigation, Room, modularization or instrumented tests
 
-```
-android-architecture/SKILL.md
-android-patterns/SKILL.md
-android-testing/SKILL.md
-```
+When editing or adding a skill:
 
-## Philosophy
+- Keep one skill per folder, with a `SKILL.md` that has `name` and `description` in its frontmatter.
+- Write the `description` so an agent can tell when to use the skill. Lead with the tasks it applies to.
+- Keep each `SKILL.md` under 20,000 characters, the limit Android Studio recommends.
 
-Code is read more often than it is written.
+## Disclaimer
 
-Optimize for the next engineer reading the code, not the current engineer writing it.
-
-## Contributions
-
-Suggestions and improvements are welcome.
-Open an issue or submit a pull request.
+AI can make mistakes, so always double-check the results.
 
 ## License
 
-MIT License.
+android-engineering-skills is licensed under the [MIT License](LICENSE). See the `LICENSE` file for details.
